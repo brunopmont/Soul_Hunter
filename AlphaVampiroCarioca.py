@@ -75,8 +75,8 @@ while True:
             else:
                 z.move_y(janela.delta_time() * velmob)
 
-    janela.draw_text(str(contadorgeral) + " FPS",0,0,16,(255,255,255))
-    janela.draw_text(str(velmob) + " FPS",0,20,16,(255,255,255))
+    janela.draw_text(str(contadorgeral) + " SEG",0,0,16,(255,255,255))
+    janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255))
 
     janela.update()
     fundo.draw()
