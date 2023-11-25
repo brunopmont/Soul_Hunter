@@ -4,14 +4,6 @@ from PPlay.gameimage import *
 from PPlay.collision import *
 import random
 
-janela = Window(1080, 720)
-teclado = Window.get_keyboard()
-fundo = GameImage("png/fundo_jogo_3.png")
-janela.set_title("Vampiro Carioca")
-
-player = Sprite("png/player.png")
-player.set_position(460, 460)
-
 def spawn_mob(listacoordenadas): #spawn de mobs aleatórios, com suas posições definidas pra fora do mapa
     listamob = [Sprite("png/zumbi.png"), Sprite("png/esqueleto.png"), Sprite("png/policial.png")]
     i = random.randint(0, 2)
@@ -21,14 +13,17 @@ def spawn_mob(listacoordenadas): #spawn de mobs aleatórios, com suas posições
     return mob
 
 def colision_tiro_mob(listamob, listatiro): #testa a colisão do tiro do player com os mobs
+    pontostemp = 0
     if listamob != [] and listatiro != []:
         for m in listamob:
             for t in listatiro:
                 if Collision.collided(m, t):
                     listamob.remove(m)
                     listatiro.remove(t)
-                if t.x > janela.width:
+                    pontostemp += 50
+                if t.x > janela.width or t.x < 0:
                     listatiro.remove(t)
+    return pontostemp
 
 def mov_tiros(listatiros):
     if listatiros != []:
@@ -38,16 +33,32 @@ def mov_tiros(listatiros):
         for t in listatiros:
             t.move_x(velTiro * janela.delta_time())
 
+janela = Window(1080, 720)
+teclado = Window.get_keyboard()
+fundo = GameImage("png/fundo_jogo_3.png")
+janela.set_title("Vampiro Carioca")
+
+
+player = Sprite("png/player.png")
+player.set_position(460, 460)
+vidas = 3
+timerinvencivel = 0
+timerpisca = 0
+            
+        
 velplayer = 200
 velmob = 50
+
 
 matMob = []
 timerMob = 0
 timervelocidade = 0
 
+
 matTiros = []
 velTiro = 50
 timerhit = 0
+pontos = 0
 
 listacoordenadas = [[-25, -25], [-25, janela.height/2], [-25, janela.height + 25], [janela.width/2, janela.height + 25],  
                     [janela.width + 25, -25], [janela.width + 25, janela.height/2], [janela.width + 25, janela.height + 25], 
@@ -59,6 +70,8 @@ while True:
     timervelocidade += janela.delta_time()
     timerMob += janela.delta_time()
     timerhit += janela.delta_time()
+    timerinvencivel += janela.delta_time()
+    timerpisca += janela.delta_time()
 
     #INCREMENTADOR DE VELOCIDADE
     if timervelocidade > 30:
@@ -104,14 +117,28 @@ while True:
             else:
                 z.move_y(janela.delta_time() * velmob)
 
+    if matMob != []:
+        for z in matMob:
+            if Collision.collided(z, player) and timerinvencivel > 3:
+                vidas -= 1
+                timerinvencivel = 0
+
     #MOVIMENTAÇÃO E COLISÃO DOS TIROS DO PLAYER
     mov_tiros(matTiros)
-    colision_tiro_mob(matMob, matTiros)
+    pontos += colision_tiro_mob(matMob, matTiros)
 
-    #DESENHA INFORMAÇÕES AÍ
-    janela.draw_text(str(timervelocidade) + " SEG",0,0,16,(255,255,255))
+    #DESENHA UMAS INFORMAÇÕES AÍ
     janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255))
+    janela.draw_text(str(pontos) + " PONTOS",0,40,16,(255,255,255))
+    janela.draw_text(str(vidas) + " VIDAS",0,60,16,(255,255,255))
 
     janela.update()
     fundo.draw()
-    player.draw()
+
+    if timerinvencivel < 3:
+        if timerpisca < 0.2:
+            player.draw()
+        if timerpisca > 0.4:
+            timerpisca = 0
+    else:
+        player.draw()
