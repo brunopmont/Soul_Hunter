@@ -45,10 +45,16 @@ player.set_position(460, 460)
 vidas = 3
 timerinvencivel = 0
 timerpisca = 0
+
+moeda = Sprite("png/moeda.png")
+moedaspawn = False
+timermsg = 10
+sorteio = 0
             
         
 velplayer = 200
 velmob = 50
+cooldown_shot = 0.5
 
 
 matMob = []
@@ -79,6 +85,31 @@ while True:
     if timervelocidade > 20:
         velmob = velmob + 20
         timervelocidade = 0
+        i = random.randint(50, janela.width - 50)
+        j = random.randint(50, janela.height - 50)
+        moeda.set_position(i, j)
+        moedaspawn = True
+        pontos += 200
+    
+    if Collision.collided_perfect(player, moeda) and moedaspawn == True:
+        sorteio = random.randint(0,2)
+        if sorteio == 0:
+            vidas += 1
+        elif sorteio == 1:
+            cooldown_shot = 1.1 * cooldown_shot
+        elif sorteio == 2:
+            velplayer = 1.2 * velplayer
+        moedaspawn = False
+        timermsg = 0
+    
+    if timermsg < 1.5:
+        timermsg += janela.delta_time()
+        if sorteio == 0:
+            janela.draw_text("MAIS UMA VIDA!",janela.width/2-100,janela.height/2-30,30,(255,255,255))
+        elif sorteio == 1:
+            janela.draw_text("TIRO 10% MAIS RÁPIDO!",janela.width/2-150,janela.height/2-30,30,(255,255,255))
+        elif sorteio == 2:
+            janela.draw_text("VELOCIDADE DE MOVIMENTO 20% MAIS RÁPIDA!",janela.width/2-270,janela.height/2-30,30,(255, 255, 255))
 
     #MOVIMENTAÇÃO E SPAWN DOS TIROS
     if teclado.key_pressed("w"):
@@ -93,7 +124,7 @@ while True:
     if teclado.key_pressed("d"):
         if player.x + 1 < janela.width - player.width: 
             player.move_x(janela.delta_time() * velplayer)
-    if (teclado.key_pressed("space") or mouse.is_button_pressed(1)) and timerhit > 0.5:
+    if (teclado.key_pressed("space") or mouse.is_button_pressed(1)) and timerhit > cooldown_shot:
             tiro = Sprite("png/tiro.png")
             tiro.set_position(player.x, player.y+player.height/2)
             if mouse.get_position()[0] > player.x:
@@ -146,6 +177,9 @@ while True:
     if vidas == 0:
         exit()
 
+    if moedaspawn == True:
+        moeda.draw()
+
     #MOVIMENTAÇÃO E COLISÃO DOS TIROS DO PLAYER
     mov_tiros(matTirosEsq, -velTiro)
     mov_tiros(matTirosDir, velTiro)
@@ -153,9 +187,9 @@ while True:
     pontos += colision_tiro_mob(matMob, matTirosDir)
 
     #DESENHA UMAS INFORMAÇÕES AÍ
-    janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255))
-    janela.draw_text(str(pontos) + " PONTOS",0,40,16,(255,255,255))
-    janela.draw_text(str(vidas) + " VIDAS",0,60,16,(255,255,255))
+    #janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255)) 
+    janela.draw_text(str(pontos) + " PONTOS",10,40,25,(255,255,255))
+    janela.draw_text(str(vidas) + " VIDAS",10,80,25,(255,255,255))
 
     janela.update()
     fundo.draw()
