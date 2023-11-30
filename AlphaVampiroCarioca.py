@@ -17,7 +17,7 @@ def colision_tiro_mob(listamob, listatiro): #testa a colisão do tiro do player 
     if listamob != [] and listatiro != []:
         for m in listamob:
             for t in listatiro:
-                if Collision.collided(m, t):
+                if Collision.collided_perfect(m, t):
                     listamob.remove(m)
                     listatiro.remove(t)
                     pontostemp += 50
@@ -25,7 +25,7 @@ def colision_tiro_mob(listamob, listatiro): #testa a colisão do tiro do player 
                     listatiro.remove(t)
     return pontostemp
 
-def mov_tiros(listatiros):
+def mov_tiros(listatiros, velTiro):
     if listatiros != []:
         for t in listatiros:
             t.draw()
@@ -35,6 +35,7 @@ def mov_tiros(listatiros):
 
 janela = Window(1080, 720)
 teclado = Window.get_keyboard()
+mouse = Window.get_mouse()
 fundo = GameImage("png/fundo_jogo_3.png")
 janela.set_title("Vampiro Carioca")
 
@@ -55,8 +56,9 @@ timerMob = 0
 timervelocidade = 0
 
 
-matTiros = []
-velTiro = 50
+matTirosEsq = []
+matTirosDir = []
+velTiro = 200
 timerhit = 0
 pontos = 0
 
@@ -74,7 +76,7 @@ while True:
     timerpisca += janela.delta_time()
 
     #INCREMENTADOR DE VELOCIDADE
-    if timervelocidade > 30:
+    if timervelocidade > 20:
         velmob = velmob + 20
         timervelocidade = 0
 
@@ -91,10 +93,19 @@ while True:
     if teclado.key_pressed("d"):
         if player.x + 1 < janela.width - player.width: 
             player.move_x(janela.delta_time() * velplayer)
-    if teclado.key_pressed("space") and timerhit > 0.3:
-            tiro = Sprite("png/moeda.png")
+    if (teclado.key_pressed("space") or mouse.is_button_pressed(1)) and timerhit > 0.5:
+            tiro = Sprite("png/tiro.png")
             tiro.set_position(player.x, player.y+player.height/2)
-            matTiros.append(tiro)
+            if mouse.get_position()[0] > player.x:
+            #if teclado.key_pressed("d"):
+                tiro.set_position(player.x+player.width, player.y+player.height/2)
+                matTirosDir.append(tiro)
+            #elif teclado.key_pressed("a"):
+            elif mouse.get_position()[0] < player.x:
+                tiro.set_position(player.x, player.y+player.height/2)
+                matTirosEsq.append(tiro)
+            #else:
+                #matTirosDir.append(tiro)
             timerhit = 0
 
     #SPAWN E MOVIMENTAÇÃO MOBS
@@ -119,13 +130,27 @@ while True:
 
     if matMob != []:
         for z in matMob:
-            if Collision.collided(z, player) and timerinvencivel > 3:
+            if Collision.collided_perfect(z, player) and timerinvencivel > 3:
                 vidas -= 1
                 timerinvencivel = 0
 
+    #INVENCIBILIDADE
+    if timerinvencivel < 3:
+        if timerpisca < 0.2:
+            player.draw()
+        if timerpisca > 0.4:
+            timerpisca = 0
+    else:
+        player.draw()
+
+    if vidas == 0:
+        exit()
+
     #MOVIMENTAÇÃO E COLISÃO DOS TIROS DO PLAYER
-    mov_tiros(matTiros)
-    pontos += colision_tiro_mob(matMob, matTiros)
+    mov_tiros(matTirosEsq, -velTiro)
+    mov_tiros(matTirosDir, velTiro)
+    pontos += colision_tiro_mob(matMob, matTirosEsq)
+    pontos += colision_tiro_mob(matMob, matTirosDir)
 
     #DESENHA UMAS INFORMAÇÕES AÍ
     janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255))
@@ -134,11 +159,3 @@ while True:
 
     janela.update()
     fundo.draw()
-
-    if timerinvencivel < 3:
-        if timerpisca < 0.2:
-            player.draw()
-        if timerpisca > 0.4:
-            timerpisca = 0
-    else:
-        player.draw()
