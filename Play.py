@@ -94,9 +94,12 @@ def gameplay(difficulty):
 
     def spawn_mob(listacoordenadas): #spawn de mobs aleatórios, com suas posições definidas pra fora do mapa
         #listamob = [Sprite("png/zumbiframes.png", 2), Sprite("png/esqueletoframes.png", 2), Sprite("png/policialframes.png", 2)]
-        listamob = [Sprite("png/zumbiframes.png", 2), Sprite("png/esqueletoframes.png", 2), Sprite("png/policialframes.png", 2)]
+        listamob = [Sprite("png/zumbiframes.png", 2), Sprite("png/esqueletoframes.png", 10), Sprite("png/ghostframes.png", 2)]
         i = random.randint(0, 2)
         mob = listamob[i]
+        if i == 10:
+            mob.set_sequence(0, 10, True) #direita
+            mob.set_total_duration(1500)
         coordenadas = random.choice(listacoordenadas)
         mob.set_position(coordenadas[0], coordenadas[1])
         return mob
@@ -127,12 +130,11 @@ def gameplay(difficulty):
     mouse = Window.get_mouse()
     janela.set_title("Vampiro Carioca")
     telanum = 0
-    fundo = GameImage("png/fundo_jogo_4.png")
 
-    fundoBAIXOE = GameImage("png/fundo_jogo_4.png")
-    fundoBAIXOD = GameImage("png/fundo_jogo_4.png")
-    fundoTOPOE = GameImage("png/fundo_jogo_4.png")
-    fundoTOPOD = GameImage("png/fundo_jogo_4.png")
+    fundoBAIXOE = GameImage("png/fundo_jogo_5.png")
+    fundoBAIXOD = GameImage("png/fundo_jogo_5.png")
+    fundoTOPOE = GameImage("png/fundo_jogo_5.png")
+    fundoTOPOD = GameImage("png/fundo_jogo_5.png")
   
     fundoBAIXOE.y = 0
     fundoBAIXOD.y = 0
@@ -144,9 +146,11 @@ def gameplay(difficulty):
     fundoTOPOE.x = 0
     fundoTOPOD.x = - fundoBAIXOE.width
 
-    player = Sprite("png/playerframes.png", 2)
-    player.set_sequence(0, 1, False) #direita
-    player.set_total_duration(500)
+    troca = 0
+    trocam = 0
+    player = Sprite("png/playerframes.png", 4)
+    player.set_sequence(0, 4, True) #direita
+    player.set_total_duration(1500)
     player.set_position(janela.width/2 - player.width/2, janela.height/2-player.height/2)
     vidas = 3
     timerinvencivel = 0
@@ -290,11 +294,28 @@ def gameplay(difficulty):
                     z.move_y(janela.delta_time() * -velmob)
                 else:
                     z.move_y(janela.delta_time() * velmob)
+                player.update()
+                
 
         if mouse.get_position()[0] > player.x:
-            player.set_curr_frame(1)
+            if troca == 0:
+                #player.set_initial_frame(3)
+                #player.set_final_frame(4)
+                troca = 2
+                player.set_sequence(2, 4, True)
+                #player.set_curr_frame(1)
+            elif troca == 1:
+                troca = 0
         elif mouse.get_position()[0] < player.x:
-            player.set_curr_frame(0)
+            if troca == 0:
+                #player.set_initial_frame(1)
+                #player.set_final_frame(2)
+                troca = 1
+                player.set_sequence(0, 2, True)
+                #player.set_curr_frame(0)
+            elif troca == 2:
+                troca = 0
+        player.update()
 
         if (teclado.key_pressed("space") or mouse.is_button_pressed(1)) and timerhit > cooldown_shot:
                 tiro = Sprite("png/tiro.png")
