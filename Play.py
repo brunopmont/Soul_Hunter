@@ -4,76 +4,70 @@ from PPlay.gameimage import *
 from PPlay.collision import *
 import random
 
-def gameplay(difficulty):
-
-    def scrollingy(bg_bottom, bg_top, roll_speed, teclado):
+def gameplay(difficulty, start):
+    def scrolling(bg_bottome, bg_bottomd, bg_tope, bg_topd, roll_speed, teclado):
         # Movimenta ambos os Sprites verticalmente 
         if teclado.key_pressed("s"):
-            bg_bottom.y -= roll_speed * janela.delta_time()
-            bg_top.y -= roll_speed * janela.delta_time()
-            if matMob != []:
-                for z in matMob:
-                    if z.y < player.y: #mob indo pra esquerda
-                        z.move_y(janela.delta_time() * -velmob*1.1)
+            bg_bottome.y -= roll_speed * janela.delta_time()
+            bg_bottomd.y -= roll_speed * janela.delta_time()
+            bg_tope.y -= roll_speed * janela.delta_time()
+            bg_topd.y -= roll_speed * janela.delta_time()
+            
 
         if teclado.key_pressed("w"):
-            bg_bottom.y += roll_speed * janela.delta_time()
-            bg_top.y += roll_speed * janela.delta_time()
-            if matMob != []:
-                for z in matMob:
-                    if z.y > player.y: #mob indo pra esquerda
-                        z.move_y(janela.delta_time() * velmob*1.1)
-
-    
-        # Se a imagem do topo já tiver sido completamente exibida,
-        # retorna ambas imagens às suas posições iniciais
-        if bg_top.y >= 0:
-            bg_bottom.y = 0
-            bg_top.y = -bg_top.height
-    
-        if bg_bottom.y < 0:
-            bg_bottom.y = bg_bottom.height
-            bg_top.y = 0
-    
-        # Renderiza as duas imagens de fundo
-        bg_bottom.draw()
-        bg_top.draw()
-
-    def scrollingx(bg_left, bg_right, roll_speed, teclado):
+            bg_bottome.y += roll_speed * janela.delta_time()
+            bg_bottomd.y += roll_speed * janela.delta_time()
+            bg_tope.y += roll_speed * janela.delta_time()
+            bg_topd.y += roll_speed * janela.delta_time()
+            
 
         # Movimenta ambos os Sprites verticalmente 
         if teclado.key_pressed("d"):
-            bg_left.x -= roll_speed * janela.delta_time()
-            bg_right.x -= roll_speed * janela.delta_time()
-            if matMob != []:
-                for z in matMob:
-                    if z.x < player.x: #mob indo pra esquerda
-                        z.move_x(janela.delta_time() * -velmob*1.1)
-                        z.set_curr_frame(1)
+            bg_bottome.x -= roll_speed * janela.delta_time()
+            bg_bottomd.x -= roll_speed * janela.delta_time()
+            bg_tope.x -= roll_speed * janela.delta_time()
+            bg_topd.x -= roll_speed * janela.delta_time()
 
 
         if teclado.key_pressed("a"):
-            bg_left.x += roll_speed * janela.delta_time()
-            bg_right.x += roll_speed * janela.delta_time()
-            if matMob != []:
-                for z in matMob:
-                    if z.x >= player.x: #mob indo pra esquerda
-                        z.move_x(janela.delta_time() * velmob*1.1)
-                        z.set_curr_frame(0)
+            bg_bottomd.x += roll_speed * janela.delta_time()
+            bg_bottome.x += roll_speed * janela.delta_time()
+            bg_topd.x += roll_speed * janela.delta_time()
+            bg_tope.x += roll_speed * janela.delta_time()
+            
     
         # Se a imagem do topo já tiver sido completamente exibida,
         # retorna ambas imagens às suas posições iniciais
-        if bg_left.x >= 0:
-            bg_left.x = -bg_left.width
-            bg_right.x = 0
+        if bg_tope.y >= 0 or bg_topd.y >= 0:
+            bg_bottome.y = 0
+            bg_bottomd.y = 0
+            bg_tope.y = -bg_tope.height
+            bg_topd.y = -bg_topd.height
     
-        if bg_right.x < 0:
-            bg_left.x = 0
-            bg_right.x = bg_right.width
+        if bg_bottome.y < 0 or bg_bottomd.y < 0:
+            bg_bottome.y = bg_bottome.height
+            bg_bottomd.y = bg_bottomd.height
+            bg_tope.y = 0
+            bg_topd.y = 0
+
+
+        if bg_bottome.x >= 0 or bg_tope.x >= 0:
+            bg_bottome.x = -bg_bottome.width
+            bg_tope.x = -bg_tope.width
+            bg_bottomd.x = 0
+            bg_topd.x = 0
+    
+        if bg_topd.x < 0 or bg_bottomd.x < 0:
+            bg_tope.x = 0
+            bg_bottome.x = 0
+            bg_topd.x = bg_topd.width
+            bg_bottomd.x = bg_bottomd.width
     
         # Renderiza as duas imagens de fundo
-        bg_left.draw()
-        bg_right.draw()
+        bg_bottome.draw()
+        bg_bottomd.draw()
+        bg_tope.draw()
+        bg_topd.draw()
 
     def load():
         ranking = open("ranking.txt", "r")
@@ -82,10 +76,10 @@ def gameplay(difficulty):
             listaranking[i] = listaranking[i].split()
         return listaranking
 
-    def adiciona(nome, pontos):
+    def adiciona(nome, pontos, tempo):
         res = ""
         listaranking = load()
-        listaranking.append([nome, str(pontos)])
+        listaranking.append([nome, pontos, tempo])
         ranking = open("ranking.txt", "w")
         for i in range(0, len(listaranking)):
             for j in range(0, len(listaranking)):
@@ -94,7 +88,7 @@ def gameplay(difficulty):
                     listaranking[i] = listaranking[j]
                     listaranking[j] = res
         for i in range(0, len(listaranking)):
-            listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + "\n"
+            listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + " " + "{}:{}".format(int(listaranking[i][2]//60), int(listaranking[i][2]%60)) + "\n"
         ranking.writelines(listaranking)
         ranking.close()
 
@@ -128,16 +122,17 @@ def gameplay(difficulty):
             for t in listatiros:
                 t.move_x(velTiro * janela.delta_time())
 
-
     janela = Window(1080, 720)
     teclado = Window.get_keyboard()
     mouse = Window.get_mouse()
-    fundo = GameImage("png/fundo_jogo_3.png")
+    janela.set_title("Vampiro Carioca")
+    telanum = 0
+    fundo = GameImage("png/fundo_jogo_4.png")
 
-    fundoBAIXOE = GameImage("png/fundo_jogo_3.png")
-    fundoBAIXOD = GameImage("png/fundo_jogo_3.png")
-    fundoTOPOE = GameImage("png/fundo_jogo_3.png")
-    fundoTOPOD = GameImage("png/fundo_jogo_3.png")
+    fundoBAIXOE = GameImage("png/fundo_jogo_4.png")
+    fundoBAIXOD = GameImage("png/fundo_jogo_4.png")
+    fundoTOPOE = GameImage("png/fundo_jogo_4.png")
+    fundoTOPOD = GameImage("png/fundo_jogo_4.png")
   
     fundoBAIXOE.y = 0
     fundoBAIXOD.y = 0
@@ -148,12 +143,6 @@ def gameplay(difficulty):
     fundoBAIXOD.x = - fundoBAIXOD.width
     fundoTOPOE.x = 0
     fundoTOPOD.x = - fundoBAIXOE.width
-
-    background_roll_speedy = 50
-
-
-    janela.set_title("Vampiro Carioca")
-    telanum = 0
 
     player = Sprite("png/playerframes.png", 2)
     player.set_sequence(0, 1, False) #direita
@@ -168,19 +157,21 @@ def gameplay(difficulty):
     timermsg = 10
     sorteio = 0
                 
-    velplayer = 200
-    velmob = 75 + 2.50*difficulty
-    cooldown_shot = 0.7 + difficulty/15
+    velplayer = 150
+    velmob = 50 + 2.50*difficulty
+    cooldown_shot = 0.6 + difficulty/10
 
 
     matMob = []
     timerMob = 0
     timervelocidade = 0
+    timermoeda = 0
+    timermeta = 300
 
 
     matTirosEsq = []
     matTirosDir = []
-    velTiro = 200+30/difficulty
+    velTiro = 150+30/difficulty
     timerhit = 0
     pontos = 0
 
@@ -190,31 +181,61 @@ def gameplay(difficulty):
 
     while True:
 
+        if start == 1:
+            timervelocidade = 0
+            timermoeda = 0
+            timerMob = 0
+            timerhit = 0
+            timerinvencivel = 0
+            timermeta = 300
+            start = 0
+        
+        if vidas == 0:
+            start = 0
+            temposob = 300 - timermeta
+            telanum = 0
+            nome = input("Nome: ")
+            adiciona(nome, pontos, temposob)
+            janela.clear()
+            return telanum            
+        if teclado.key_pressed("esc"): #CASO ESTEJA NA TELA DO JOGO E APERTAR ESC, VOLTAR PRO MENU
+            start = 0
+            telanum == 0
+            janela.clear()
+            janela.set_background_color((255, 255, 255))
+            return telanum
+            
         #CONTADORES
         timervelocidade += janela.delta_time()
+        timermoeda += janela.delta_time()
         timerMob += janela.delta_time()
         timerhit += janela.delta_time()
         timerinvencivel += janela.delta_time()
-        timerpisca += janela.delta_time()
+        timermeta -= janela.delta_time()
 
         #INCREMENTADOR DE VELOCIDADE
         if timervelocidade > 20 - difficulty:
-            velmob = velmob + 20
+            velmob = velmob + 10
             timervelocidade = 0
-            i = random.randint(50, janela.width - 50)
-            j = random.randint(50, janela.height - 50)
+            pontos += 200
+
+        if timermoeda > 15:
+            timermoeda = 0
+            i = random.randint(150, janela.width - 150)
+            j = random.randint(150, janela.height - 150)
             moeda.set_position(i, j)
             moedaspawn = True
-            pontos += 200
         
         if Collision.collided_perfect(player, moeda) and moedaspawn == True:
-            sorteio = random.randint(0,2)
+            sorteio = random.randint(0,5)
             if sorteio == 0:
                 vidas += 1
-            elif sorteio == 1:
-                cooldown_shot = 1.1 * cooldown_shot
-            elif sorteio == 2:
-                velplayer = 1.2 * velplayer
+            elif sorteio == 1 or sorteio == 4:
+                cooldown_shot = 0.90 * cooldown_shot
+            elif sorteio == 2  or sorteio == 5:
+                velplayer = 1.15 * velplayer
+            elif sorteio == 3:
+                velTiro = 1.1 * velTiro
             moedaspawn = False
             timermsg = 0
         
@@ -222,24 +243,65 @@ def gameplay(difficulty):
             timermsg += janela.delta_time()
             if sorteio == 0:
                 janela.draw_text("MAIS UMA VIDA!",janela.width/2-100,janela.height/8-30,30,(255,255,255))
-            elif sorteio == 1:
-                janela.draw_text("+10% VELOCIDADE DE DISPARO!",janela.width/2-150,janela.height/8-30,30,(255,255,255))
-            elif sorteio == 2:
-                janela.draw_text("+20% VELOCIDADE MOVIMENTO!",janela.width/2-270,janela.height/8-30,30,(255, 255, 255))
+            elif sorteio == 1 or sorteio == 4:
+                janela.draw_text("+10% VELOCIDADE DE RECARGA!",janela.width/2-150,janela.height/8-30,30,(255,255,255))
+            elif sorteio == 2 or sorteio == 5:
+                janela.draw_text("+15% VELOCIDADE MOVIMENTO!",janela.width/2-270,janela.height/8-30,30,(255, 255, 255))
+            elif sorteio == 3:
+                janela.draw_text("+10% VELOCIDADE DA BALA!",janela.width/2-220,janela.height/8-30,30,(255, 255, 255))
+
 
         #MOVIMENTAÇÃO E SPAWN DOS TIROS
-        '''if teclado.key_pressed("w"):
-            if player.y - 1 > 0: 
-                player.move_y(janela.delta_time() * -velplayer)
+        if teclado.key_pressed("w"):
+            if matMob != []:
+                for z in matMob:
+                        z.move_y(janela.delta_time() * velplayer)
+            if matTirosDir != []:
+                for td in matTirosDir:
+                    td.move_y(janela.delta_time() * velplayer)
+            if matTirosEsq != []:
+                for te in matTirosEsq:
+                    te.move_y(janela.delta_time() * velplayer)
+
         if teclado.key_pressed("s"):
-            if player.y + 1 < janela.height - player.height: 
-                player.move_y(janela.delta_time() * velplayer)
+            if matMob != []:
+                for z in matMob:
+                        z.move_y(janela.delta_time() * -velplayer)
+            if matTirosDir != []:
+                for td in matTirosDir:
+                    td.move_y(janela.delta_time() * -velplayer)
+            if matTirosEsq != []:
+                for te in matTirosEsq:
+                    te.move_y(janela.delta_time() * -velplayer)
         if teclado.key_pressed("a"):
-            if player.x - 1 > 0: 
-                player.move_x(janela.delta_time() * -velplayer)
+            if matMob != []:
+                for z in matMob:
+                        z.move_x(janela.delta_time() * velplayer)
+            if matTirosDir != []:
+                for td in matTirosDir:
+                    td.move_x(janela.delta_time() * velplayer)
+
         if teclado.key_pressed("d"):
-            if player.x + 1 < janela.width - player.width: 
-                player.move_x(janela.delta_time() * velplayer)'''
+            if matMob != []:
+                for z in matMob:
+                    z.move_x(janela.delta_time() * -velplayer)
+            if matTirosEsq != []:
+                    for te in matTirosEsq:
+                        te.move_x(janela.delta_time() * -velplayer)
+
+
+        if matMob != []:
+            for z in matMob:
+                if z.x >= player.x: #mob indo pra esquerda
+                    z.move_x(janela.delta_time() * -velmob)
+                    z.set_curr_frame(0)
+                else: #mod indo pra direita
+                    z.move_x(janela.delta_time() * velmob)
+                    z.set_curr_frame(1)
+                if z.y >= player.y:
+                    z.move_y(janela.delta_time() * -velmob)
+                else:
+                    z.move_y(janela.delta_time() * velmob)
 
         if mouse.get_position()[0] > player.x:
             player.set_curr_frame(1)
@@ -258,7 +320,7 @@ def gameplay(difficulty):
                 timerhit = 0
 
         #SPAWN E MOVIMENTAÇÃO MOBS
-        if timerMob > 1-difficulty/20:
+        if timerMob > 2-difficulty/10:
             matMob.append(spawn_mob(listacoordenadas))
             timerMob = 0
 
@@ -268,44 +330,19 @@ def gameplay(difficulty):
 
         if matMob != []:
             for z in matMob:
-                if z.x > player.x: #mob indo pra esquerda
-                    z.move_x(janela.delta_time() * -velmob)
-                    z.set_curr_frame(0)
-                else: #mod indo pra direita
-                    z.move_x(janela.delta_time() * velmob)
-                    z.set_curr_frame(1)
-                if z.y > player.y:
-                    z.move_y(janela.delta_time() * -velmob)
-                else:
-                    z.move_y(janela.delta_time() * velmob)
-
-        if matMob != []:
-            for z in matMob:
                 if Collision.collided(z, player) and timerinvencivel > 3:
                     vidas -= 1
                     timerinvencivel = 0
 
         #INVENCIBILIDADE
         if timerinvencivel < 3-difficulty/10:
+            timerpisca += janela.delta_time()
             if timerpisca < 0.2:
                 player.draw()
             if timerpisca > 0.4:
                 timerpisca = 0
         else:
             player.draw()
-
-        if vidas == 0:
-            telanum = 0
-            nome = input("Nome: ")
-            adiciona(nome, pontos)
-            janela.clear()
-            return telanum
-            
-        if teclado.key_pressed("esc"): #CASO ESTEJA NA TELA DO JOGO E APERTAR ESC, VOLTAR PRO MENU
-            janela.clear()
-            janela.set_background_color((255, 255, 255))
-            telanum = 0
-            return telanum
 
         if moedaspawn == True:
             if teclado.key_pressed("w"):
@@ -328,12 +365,13 @@ def gameplay(difficulty):
         #janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255)) 
         janela.draw_text(str(pontos) + " PONTOS",10,40,25,(255,255,255))
         janela.draw_text(str(vidas) + " VIDAS",10,80,25,(255,255,255))
-        
+        janela.draw_text("SOBREVIVA: " + "{}:{}".format(int(timermeta//60), int(timermeta%60)),10,120,25,(255,255,255))
+
+        janela.draw_text(str(timerMob) + " timermob",10,200,25,(255,255,255))
+        janela.draw_text(str(timervelocidade) + " timervelocidade",10,225,25,(255,255,255))
+        janela.draw_text(str(timermeta) + " timermeta",10,250,25,(255,255,255))
+
         
         janela.update()
-        scrollingy(fundoBAIXOE, fundoTOPOE, velplayer, teclado)
-        scrollingy(fundoBAIXOD, fundoTOPOD, velplayer, teclado)
-
-        scrollingx(fundoBAIXOE, fundoBAIXOD, velplayer, teclado)
-        scrollingx(fundoTOPOE, fundoTOPOD, velplayer, teclado)
+        scrolling(fundoBAIXOE, fundoBAIXOD, fundoTOPOE, fundoTOPOD, velplayer, teclado)
         

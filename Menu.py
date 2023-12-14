@@ -4,7 +4,7 @@ from Play import *
 
 telanum = 0 #VARIÁVEL DE CONTROLE DE QUAL JANELA ESTÁ ABERTA
 janela = Window(1080, 720)
-janela.set_title("Space Invaders")
+janela.set_title("Vampiro")
 janela.set_background_color((255, 255, 255))
 cursor = Window.get_mouse() #ATIVAR MOUSE
 teclado = Window.get_keyboard() #ATIVAR TECLADO
@@ -29,7 +29,7 @@ def adiciona(nome, pontos):
                 listaranking[i] = listaranking[j]
                 listaranking[j] = res
     for i in range(0, len(listaranking)):
-        listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + "\n"
+        listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + " " + "{}:{}".format(int(listaranking[i][2]//60), int(listaranking[i][2]%60)) + "\n"
     ranking.writelines(listaranking)
     ranking.close()
 
@@ -43,6 +43,7 @@ def tela_inicial(cursor, telanum):
     ranking.set_position(janela.width/2-jogar.width/2, 3 * janela.height/6)
     sair.set_position(janela.width/2-jogar.width/2, 4 * janela.height/6)
     janela.set_background_color((255, 255, 255))
+
     while True:
         jogar.draw()
         dificuldade.draw()
@@ -55,7 +56,7 @@ def tela_inicial(cursor, telanum):
             jogar.set_position(janela.width/2-jogar.width/2, janela.height/6)
             if cursor.is_button_pressed(1):
                 janela.clear()
-                gameplay(1)
+                gameplay(1, 1)
         else:
             jogar = Sprite("png/jogar.png")
             jogar.set_position(janela.width/2-jogar.width/2, janela.height/6)
@@ -115,7 +116,7 @@ def tela_dificuldade(cursor, telanum):
             facil.set_position(janela.width/2-facil.width/2, janela.height/6)
             if cursor.is_button_pressed(1):
                 janela.clear()
-                gameplay(1)
+                gameplay(1, 1)
         else:
             facil = Sprite("png/facil.png")
             facil.set_position(janela.width/2-facil.width/2, janela.height/6)
@@ -126,7 +127,7 @@ def tela_dificuldade(cursor, telanum):
             medio.set_position(janela.width/2-medio.width/2, 3*janela.height/6)
             if cursor.is_button_pressed(1):
                 janela.clear()
-                gameplay(2)
+                gameplay(2, 1)
         else:
             medio = Sprite("png/medio.png")
             medio.set_position(janela.width/2-medio.width/2, 3*janela.height/6)
@@ -137,7 +138,7 @@ def tela_dificuldade(cursor, telanum):
             dificil.set_position(janela.width/2-dificil.width/2, 5*janela.height/6)
             if cursor.is_button_pressed(1):
                 janela.clear()
-                gameplay(3)
+                gameplay(3, 1)
         else:
             dificil = Sprite("png/dificil.png")
             dificil.set_position(janela.width/2-dificil.width/2, 5*janela.height/6)
@@ -152,8 +153,8 @@ def tela_ranking():
                 tela_inicial(cursor, telanum)
         if len(lista) < 5:
             for i in range(0, len(lista)):
-                janela.draw_text(lista[i][0][0:3:].upper() + "  " + lista[i][1], janela.width/2-120,150 + 80*i,50,(0,0,0))
+                janela.draw_text(lista[i][0][0:3:].upper() + "  " + lista[i][2] + "  " + lista[i][1] + "pts",janela.width/2-220,150 + 80*i,50,(0,0,0))
         else:
             for i in range(0, 5):
-                janela.draw_text(lista[i][0][0:3:].upper() + "  " + lista[i][1], janela.width/2-120,150 + 80*i,50,(0,0,0))
+                janela.draw_text(lista[i][0][0:3:].upper() + "  " + lista[i][2] + "  " + lista[i][1] + "pts", janela.width/2-220,150 + 80*i,50,(0,0,0))
         janela.update()
