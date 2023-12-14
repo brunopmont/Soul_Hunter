@@ -4,7 +4,7 @@ from PPlay.gameimage import *
 from PPlay.collision import *
 import random
 
-def gameplay(difficulty, start):
+def gameplay(difficulty):
     def scrolling(bg_bottome, bg_bottomd, bg_tope, bg_topd, roll_speed, teclado):
         # Movimenta ambos os Sprites verticalmente 
         if teclado.key_pressed("s"):
@@ -76,10 +76,10 @@ def gameplay(difficulty, start):
             listaranking[i] = listaranking[i].split()
         return listaranking
 
-    def adiciona(nome, pontos, tempo):
+    def adiciona(nome, pontos):
         res = ""
         listaranking = load()
-        listaranking.append([nome, pontos, tempo])
+        listaranking.append([nome, pontos])
         ranking = open("ranking.txt", "w")
         for i in range(0, len(listaranking)):
             for j in range(0, len(listaranking)):
@@ -88,7 +88,7 @@ def gameplay(difficulty, start):
                     listaranking[i] = listaranking[j]
                     listaranking[j] = res
         for i in range(0, len(listaranking)):
-            listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + " " + "{}:{}".format(int(listaranking[i][2]//60), int(listaranking[i][2]%60)) + "\n"
+            listaranking[i] = str(listaranking[i][0]) + " " + str(listaranking[i][1]) + "\n"
         ranking.writelines(listaranking)
         ranking.close()
 
@@ -161,7 +161,6 @@ def gameplay(difficulty, start):
     velmob = 50 + 2.50*difficulty
     cooldown_shot = 0.6 + difficulty/10
 
-
     matMob = []
     timerMob = 0
     timervelocidade = 0
@@ -180,26 +179,15 @@ def gameplay(difficulty, start):
                         [janela.width/2, - 25]]
 
     while True:
-
-        if start == 1:
-            timervelocidade = 0
-            timermoeda = 0
-            timerMob = 0
-            timerhit = 0
-            timerinvencivel = 0
-            timermeta = 300
-            start = 0
-        
         if vidas == 0:
-            start = 0
             temposob = 300 - timermeta
             telanum = 0
             nome = input("Nome: ")
-            adiciona(nome, pontos, temposob)
+            adiciona(nome, pontos)
             janela.clear()
-            return telanum            
+            return telanum
+            
         if teclado.key_pressed("esc"): #CASO ESTEJA NA TELA DO JOGO E APERTAR ESC, VOLTAR PRO MENU
-            start = 0
             telanum == 0
             janela.clear()
             janela.set_background_color((255, 255, 255))
@@ -320,7 +308,7 @@ def gameplay(difficulty, start):
                 timerhit = 0
 
         #SPAWN E MOVIMENTAÇÃO MOBS
-        if timerMob > 2-difficulty/10:
+        if timerMob > 1.5-difficulty/10:
             matMob.append(spawn_mob(listacoordenadas))
             timerMob = 0
 
@@ -365,12 +353,6 @@ def gameplay(difficulty, start):
         #janela.draw_text(str(velmob) + " PIXEL/SEG",0,20,16,(255,255,255)) 
         janela.draw_text(str(pontos) + " PONTOS",10,40,25,(255,255,255))
         janela.draw_text(str(vidas) + " VIDAS",10,80,25,(255,255,255))
-        janela.draw_text("SOBREVIVA: " + "{}:{}".format(int(timermeta//60), int(timermeta%60)),10,120,25,(255,255,255))
-
-        janela.draw_text(str(timerMob) + " timermob",10,200,25,(255,255,255))
-        janela.draw_text(str(timervelocidade) + " timervelocidade",10,225,25,(255,255,255))
-        janela.draw_text(str(timermeta) + " timermeta",10,250,25,(255,255,255))
-
         
         janela.update()
         scrolling(fundoBAIXOE, fundoBAIXOD, fundoTOPOE, fundoTOPOD, velplayer, teclado)
