@@ -2,6 +2,7 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.collision import *
+from PPlay.sound import *
 import random
 
 def gameplay(difficulty):
@@ -94,12 +95,11 @@ def gameplay(difficulty):
 
     def spawn_mob(listacoordenadas): #spawn de mobs aleatórios, com suas posições definidas pra fora do mapa
         #listamob = [Sprite("png/zumbiframes.png", 2), Sprite("png/esqueletoframes.png", 2), Sprite("png/policialframes.png", 2)]
-        listamob = [Sprite("png/zumbiframes.png", 2), Sprite("png/esqueletoframes.png", 10), Sprite("png/ghostframes.png", 2)]
+        listamob = [Sprite("png/zumbiframes.png", 4), Sprite("png/esqueletoframes.png", 4), Sprite("png/ghostframes.png", 4)]
         i = random.randint(0, 2)
         mob = listamob[i]
-        if i == 10:
-            mob.set_sequence(0, 10, True) #direita
-            mob.set_total_duration(1500)
+        mob.set_sequence(0, 2, True)
+        mob.set_total_duration(1400)
         coordenadas = random.choice(listacoordenadas)
         mob.set_position(coordenadas[0], coordenadas[1])
         return mob
@@ -147,7 +147,6 @@ def gameplay(difficulty):
     fundoTOPOD.x = - fundoBAIXOE.width
 
     troca = 0
-    trocam = 0
     player = Sprite("png/playerframes.png", 4)
     player.set_sequence(0, 4, True) #direita
     player.set_total_duration(1500)
@@ -156,7 +155,7 @@ def gameplay(difficulty):
     timerinvencivel = 0
     timerpisca = 0
 
-    moeda = Sprite("png/moeda.png")
+    moeda = Sprite("png/bau.png")
     moedaspawn = False
     timermsg = 10
     sorteio = 0
@@ -181,8 +180,9 @@ def gameplay(difficulty):
     listacoordenadas = [[-25, -25], [-25, janela.height/2], [-25, janela.height + 25], [janela.width/2, janela.height + 25],  
                         [janela.width + 25, -25], [janela.width + 25, janela.height/2], [janela.width + 25, janela.height + 25], 
                         [janela.width/2, - 25]]
-
+    
     while True:
+    
         if vidas == 0:
             temposob = 300 - timermeta
             telanum = 0
@@ -218,7 +218,7 @@ def gameplay(difficulty):
             moeda.set_position(i, j)
             moedaspawn = True
         
-        if Collision.collided_perfect(player, moeda) and moedaspawn == True:
+        if Collision.collided(player, moeda) and moedaspawn == True:
             sorteio = random.randint(0,5)
             if sorteio == 0:
                 vidas += 1
@@ -284,48 +284,42 @@ def gameplay(difficulty):
 
         if matMob != []:
             for z in matMob:
-                if z.x >= player.x: #mob indo pra esquerda
+                if z.x > player.x: #mob indo pra esquerda
                     z.move_x(janela.delta_time() * -velmob)
+                if z.x > player.x + 20:
                     z.set_curr_frame(0)
                 else: #mod indo pra direita
                     z.move_x(janela.delta_time() * velmob)
-                    z.set_curr_frame(1)
+                    z.set_curr_frame(3)
                 if z.y >= player.y:
                     z.move_y(janela.delta_time() * -velmob)
                 else:
                     z.move_y(janela.delta_time() * velmob)
-                player.update()
-                
 
+                
         if mouse.get_position()[0] > player.x:
             if troca == 0:
-                #player.set_initial_frame(3)
-                #player.set_final_frame(4)
                 troca = 2
                 player.set_sequence(2, 4, True)
-                #player.set_curr_frame(1)
             elif troca == 1:
                 troca = 0
         elif mouse.get_position()[0] < player.x:
             if troca == 0:
-                #player.set_initial_frame(1)
-                #player.set_final_frame(2)
                 troca = 1
                 player.set_sequence(0, 2, True)
-                #player.set_curr_frame(0)
             elif troca == 2:
                 troca = 0
         player.update()
 
         if (teclado.key_pressed("space") or mouse.is_button_pressed(1)) and timerhit > cooldown_shot:
-                tiro = Sprite("png/tiro.png")
-                tiro.set_position(player.x, player.y+player.height/2)
+                tiroe = Sprite("png/tiroe.png")
+                tirod = Sprite("png/tirod.png")
                 if mouse.get_position()[0] > player.x:
-                    tiro.set_position(player.x+player.width, player.y+player.height/2)
-                    matTirosDir.append(tiro)
+                    tirod.set_position(player.x+player.width, player.y+player.height/2-tiroe.height/2)
+                    matTirosDir.append(tirod)
                 elif mouse.get_position()[0] < player.x:
-                    tiro.set_position(player.x, player.y+player.height/2)
-                    matTirosEsq.append(tiro)
+                    tiroe.set_position(player.x-tiroe.width, player.y+player.height/2-tiroe.height/2)
+                    matTirosEsq.append(tiroe)
                 timerhit = 0
 
         #SPAWN E MOVIMENTAÇÃO MOBS
